@@ -1,0 +1,793 @@
+# TiMOS-B-21.10.R1 both/x86_64 Nokia 7750 SR Copyright (c) 2000-2021 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Thu Nov 4 19:49:50 PDT 2021 by builder in /builds/c/2110B/R1/panos/main/sros
+# Configuration format version 21.10 revision 0
+
+# Generated 2022-01-31T17:54:39.9+00:00 by admin from 200::
+# Commit ID 43
+# Committed 2022-01-26T16:26:34.3+00:00 by admin (MD-CLI) from 200::
+# Commit ID 42
+# Committed 2022-01-26T16:25:27.9+00:00 by admin (MD-CLI) from 200::
+# Commit ID 41
+# Committed 2022-01-26T16:23:48.2+00:00 by admin (MD-CLI) from 200::
+# Commit ID 40
+# Committed 2022-01-26T16:18:27.1+00:00 by admin (MD-CLI) from 200::
+
+configure {
+    card 1 {
+        card-type iom-1
+        mda 1 {
+            mda-type me12-100gb-qsfp28
+        }
+        mda 2 {
+        }
+        fp 1 {
+        }
+    }
+    log {
+        filter "1001" {
+            named-entry "10" {
+                description "Collect only events of major severity or higher"
+                action forward
+                match {
+                    severity {
+                        gte major
+                    }
+                }
+            }
+        }
+        log-id "100" {
+            description "Default Serious Errors Log"
+            filter "1001"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+        log-id "99" {
+            description "Default System Log"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+    }
+    policy-options {
+        community "color-100" {
+            member "color:00:100" { }
+        }
+        community "vrf-100-community" {
+            member "target:65510:100" { }
+        }
+        prefix-list "vrf-100-prefix" {
+            prefix 10.0.100.0/24 type exact {
+            }
+        }
+        policy-statement "export-all" {
+            entry 10 {
+                from {
+                    protocol {
+                        name [direct]
+                    }
+                }
+                action {
+                    action-type accept
+                }
+            }
+            default-action {
+                action-type accept
+            }
+        }
+        policy-statement "vrf-100-export" {
+            entry 20 {
+                from {
+                    protocol {
+                        name [bgp]
+                    }
+                }
+                to {
+                    protocol {
+                        name [bgp-vpn]
+                    }
+                }
+                action {
+                    action-type accept
+                    community {
+                        add ["vrf-100-community" "color-100"]
+                    }
+                }
+            }
+        }
+    }
+    port 1/1/c1 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c1/1 {
+        admin-state enable
+    }
+    port 1/1/c2 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c2/1 {
+        admin-state enable
+    }
+    port 1/1/c3 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c3/1 {
+        admin-state enable
+        ethernet {
+            mode hybrid
+            encap-type dot1q
+        }
+    }
+    port 1/1/c4 {
+    }
+    port 1/1/c5 {
+    }
+    port 1/1/c6 {
+    }
+    port 1/1/c7 {
+    }
+    port 1/1/c8 {
+    }
+    port 1/1/c9 {
+    }
+    port 1/1/c10 {
+    }
+    port 1/1/c11 {
+    }
+    port 1/1/c12 {
+    }
+    router "Base" {
+        autonomous-system 6500
+        ecmp 4
+        interface "system" {
+            ipv4 {
+                primary {
+                    address 6.6.6.6
+                    prefix-length 32
+                }
+            }
+        }
+        interface "toCE1" {
+            ipv4 {
+                bfd {
+                    admin-state enable
+                }
+                primary {
+                    address 10.1.1.23
+                    prefix-length 31
+                }
+            }
+        }
+        interface "toR3" {
+            port 1/1/c1/1
+            ipv4 {
+                bfd {
+                    admin-state enable
+                }
+                primary {
+                    address 10.1.1.15
+                    prefix-length 31
+                }
+            }
+            if-attribute {
+                delay {
+                    static 100
+                }
+            }
+        }
+        interface "toR4" {
+            port 1/1/c2/1
+            ipv4 {
+                bfd {
+                    admin-state enable
+                }
+                primary {
+                    address 10.1.1.17
+                    prefix-length 31
+                }
+            }
+            if-attribute {
+                delay {
+                    static 100
+                }
+            }
+        }
+        mpls-labels {
+            sr-labels {
+                start 20001
+                end 20200
+            }
+            reserved-label-block "sr-bsid" {
+                start-label 20300
+                end-label 20900
+            }
+        }
+        bgp {
+            min-route-advertisement 1
+            vpn-apply-export true
+            vpn-apply-import true
+            rapid-withdrawal true
+            ebgp-default-reject-policy {
+                import false
+                export false
+            }
+            rapid-update {
+                vpn-ipv4 true
+                vpn-ipv6 true
+                l2-vpn true
+                mvpn-ipv4 true
+                mdt-safi true
+                mcast-vpn-ipv4 true
+                mvpn-ipv6 true
+                evpn true
+                label-ipv4 true
+                label-ipv6 true
+                mcast-vpn-ipv6 true
+            }
+            group "mpls" {
+                type internal
+                family {
+                    vpn-ipv4 true
+                    l2-vpn true
+                    mvpn-ipv4 true
+                    evpn true
+                }
+            }
+            neighbor "1.1.1.1" {
+                group "mpls"
+            }
+            neighbor "2.2.2.2" {
+                group "mpls"
+            }
+            neighbor "3.3.3.3" {
+                group "mpls"
+            }
+            neighbor "4.4.4.4" {
+                group "mpls"
+            }
+            neighbor "5.5.5.5" {
+                group "mpls"
+            }
+            neighbor "7.7.7.7" {
+                group "mpls"
+            }
+        }
+        isis 0 {
+            admin-state enable
+            advertise-router-capability area
+            advertise-tunnel-link true
+            level-capability 2
+            traffic-engineering true
+            area-address [49.01]
+            timers {
+                spf-wait {
+                    spf-max-wait 1000
+                    spf-initial-wait 10
+                    spf-second-wait 100
+                }
+                lsp-wait {
+                    lsp-max-wait 500
+                    lsp-second-wait 100
+                }
+            }
+            loopfree-alternate {
+                remote-lfa {
+                    node-protect {
+                    }
+                }
+                ti-lfa {
+                    node-protect { }
+                }
+            }
+            flexible-algorithms {
+                admin-state enable
+                flex-algo 129 {
+                    participate true
+                    advertise "FAD-129-delay"
+                    loopfree-alternate { }
+                }
+            }
+            segment-routing {
+                admin-state enable
+                prefix-sid-range {
+                    global
+                }
+            }
+            interface "system" {
+                ipv4-node-sid {
+                    index 6
+                }
+                flex-algo 129 {
+                    ipv4-node-sid {
+                        index 60
+                    }
+                }
+            }
+            interface "toR3" {
+                interface-type point-to-point
+            }
+            interface "toR4" {
+                interface-type point-to-point
+            }
+            level 2 {
+                wide-metrics-only true
+            }
+        }
+        ldp {
+            interface-parameters {
+                interface "toR3" {
+                    ipv4 {
+                    }
+                }
+                interface "toR4" {
+                    ipv4 {
+                    }
+                }
+            }
+        }
+        mpls {
+            admin-state enable
+            interface "toR3" {
+            }
+            interface "toR4" {
+            }
+        }
+        rsvp {
+            interface "toR3" {
+            }
+            interface "toR4" {
+            }
+        }
+    }
+    routing-options {
+        ip-fast-reroute true
+        flexible-algorithm-definitions {
+            flex-algo "FAD-129-delay" {
+                admin-state enable
+                description "flex-algo 129 -delay"
+                metric-type delay
+                priority 200
+            }
+        }
+    }
+    service {
+        customer "1" {
+            description "Default Customer"
+        }
+        vprn "100" {
+            admin-state enable
+            service-id 100
+            customer "1"
+            autonomous-system 65612
+            bgp-ipvpn {
+                mpls {
+                    admin-state enable
+                    route-distinguisher "5.5.5.5:100"
+                    vrf-target {
+                        import-community "target:65510:100"
+                    }
+                    vrf-export {
+                        policy ["vrf-100-export"]
+                    }
+                    auto-bind-tunnel {
+                        resolution filter
+                        allow-flex-algo-fallback true
+                        resolution-filter {
+                            sr-isis true
+                            sr-policy true
+                        }
+                    }
+                }
+            }
+            bgp {
+                admin-state enable
+                min-route-advertisement 1
+                rapid-withdrawal true
+                ebgp-default-reject-policy {
+                    import false
+                    export false
+                }
+                group "vrf100" {
+                    type external
+                    peer-as 65100
+                    export {
+                        policy ["export-all"]
+                    }
+                }
+                neighbor "10.0.100.8" {
+                    group "vrf100"
+                }
+            }
+            interface "local" {
+                admin-state enable
+                loopback true
+                ipv4 {
+                    primary {
+                        address 192.168.100.1
+                        prefix-length 32
+                    }
+                }
+            }
+            interface "toCE1" {
+                admin-state enable
+                ipv4 {
+                    primary {
+                        address 10.0.100.1
+                        prefix-length 24
+                    }
+                }
+                sap 1/1/c3/1:100 {
+                }
+            }
+        }
+    }
+    system {
+        name "R6"
+        grpc {
+            admin-state enable
+            allow-unsecure-connection
+        }
+        management-interface {
+            configuration-mode model-driven
+            netconf {
+                admin-state enable
+                auto-config-save true
+                capabilities {
+                    candidate false
+                }
+            }
+            yang-modules {
+                nokia-combined-modules true
+            }
+        }
+        bluetooth {
+            advertising-timeout 30
+        }
+        security {
+            aaa {
+                remote-servers {
+                    radius {
+                        use-default-template true
+                    }
+                }
+                local-profiles {
+                    profile "administrative" {
+                        default-action permit-all
+                        netconf {
+                            base-op-authorization {
+                                action true
+                                cancel-commit true
+                                close-session true
+                                commit true
+                                copy-config true
+                                create-subscription true
+                                delete-config true
+                                discard-changes true
+                                edit-config true
+                                get true
+                                get-config true
+                                get-data true
+                                get-schema true
+                                kill-session true
+                                lock true
+                                validate true
+                            }
+                        }
+                        entry 10 {
+                            action permit
+                            match "configure system security"
+                        }
+                        entry 20 {
+                            action permit
+                            match "show system security"
+                        }
+                        entry 30 {
+                            action permit
+                            match "tools perform security"
+                        }
+                        entry 40 {
+                            action permit
+                            match "tools dump security"
+                        }
+                        entry 50 {
+                            action permit
+                            match "admin system security"
+                        }
+                        entry 100 {
+                            action deny
+                            match "configure li"
+                        }
+                        entry 110 {
+                            action deny
+                            match "show li"
+                        }
+                        entry 111 {
+                            action deny
+                            match "clear li"
+                        }
+                        entry 112 {
+                            action deny
+                            match "tools dump li"
+                        }
+                    }
+                    profile "default" {
+                        entry 10 {
+                            action permit
+                            match "exec"
+                        }
+                        entry 20 {
+                            action permit
+                            match "exit"
+                        }
+                        entry 30 {
+                            action permit
+                            match "help"
+                        }
+                        entry 40 {
+                            action permit
+                            match "logout"
+                        }
+                        entry 50 {
+                            action permit
+                            match "password"
+                        }
+                        entry 60 {
+                            action deny
+                            match "show config"
+                        }
+                        entry 65 {
+                            action deny
+                            match "show li"
+                        }
+                        entry 66 {
+                            action deny
+                            match "clear li"
+                        }
+                        entry 67 {
+                            action deny
+                            match "tools dump li"
+                        }
+                        entry 68 {
+                            action deny
+                            match "state li"
+                        }
+                        entry 70 {
+                            action permit
+                            match "show"
+                        }
+                        entry 75 {
+                            action permit
+                            match "state"
+                        }
+                        entry 80 {
+                            action permit
+                            match "enable-admin"
+                        }
+                        entry 90 {
+                            action permit
+                            match "enable"
+                        }
+                        entry 100 {
+                            action deny
+                            match "configure li"
+                        }
+                    }
+                }
+                user-template radius-default {
+                    access {
+                        netconf true
+                    }
+                }
+            }
+            cpm-filter {
+                ip-filter {
+                    entry 10 {
+                    }
+                }
+            }
+            ssh {
+                server-cipher-list-v1 {
+                    cipher 200 {
+                        name 3des
+                    }
+                    cipher 205 {
+                        name blowfish
+                    }
+                }
+                server-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 210 {
+                        name blowfish-cbc
+                    }
+                    cipher 215 {
+                        name cast128-cbc
+                    }
+                    cipher 220 {
+                        name arcfour
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                    cipher 235 {
+                        name rijndael-cbc
+                    }
+                }
+                client-cipher-list-v1 {
+                    cipher 200 {
+                        name 3des
+                    }
+                    cipher 205 {
+                        name blowfish
+                    }
+                    cipher 210 {
+                        name des
+                    }
+                }
+                client-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 210 {
+                        name blowfish-cbc
+                    }
+                    cipher 215 {
+                        name cast128-cbc
+                    }
+                    cipher 220 {
+                        name arcfour
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                    cipher 235 {
+                        name rijndael-cbc
+                    }
+                }
+                server-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 230 {
+                        name hmac-ripemd160
+                    }
+                    mac 235 {
+                        name hmac-ripemd160-openssh-com
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+                client-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 230 {
+                        name hmac-ripemd160
+                    }
+                    mac 235 {
+                        name hmac-ripemd160-openssh-com
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+            }
+            user-params {
+                local-user {
+                    user "admin" {
+                        password "$2y$10$TQrZlpBDra86.qoexZUzQeBXDY1FcdDhGWdD9lLxMuFyPVSm0OGy6"
+                        access {
+                            console true
+                            netconf true
+                            grpc true
+                        }
+                        console {
+                            member ["administrative"]
+                        }
+                    }
+                    user "netconf" {
+                        password "$2y$10$xXgwXA7Puc8ll/3xmsTKU.p8KCeO5EPRvakyGB/qey55ezSuVuB9G"
+                        access {
+                            netconf true
+                        }
+                        console {
+                            member ["administrative"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+persistent-indices {
+    description "Persistent indices are maintained by the system and must not be modified."
+    vrtr-id {
+        router-name "100" vrtr-id 2
+    }
+    vrtr-if-id {
+        router-name "100" interface-name "local" vrtr-id 2 if-index 5
+        router-name "100" interface-name "toCE1" vrtr-id 2 if-index 6
+        router-name "Base" interface-name "toCE1" vrtr-id 1 if-index 2
+        router-name "Base" interface-name "toR3" vrtr-id 1 if-index 3
+        router-name "Base" interface-name "toR4" vrtr-id 1 if-index 4
+    }
+}
+
+# Finished 2022-01-31T17:54:39.9+00:00

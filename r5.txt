@@ -1,0 +1,787 @@
+# TiMOS-B-21.10.R1 both/x86_64 Nokia 7750 SR Copyright (c) 2000-2021 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Thu Nov 4 19:49:50 PDT 2021 by builder in /builds/c/2110B/R1/panos/main/sros
+# Configuration format version 21.10 revision 0
+
+# Generated 2022-01-31T17:54:40.8+00:00 by admin from 200::
+# Commit ID 88
+# Committed 2022-01-26T18:29:28.0+00:00 by admin (MD-CLI) from 200::
+# Commit ID 87
+# Committed 2022-01-26T18:05:57.3+00:00 by admin (MD-CLI) from 200::
+# Commit ID 86
+# Committed 2022-01-26T17:56:44.7+00:00 by admin (MD-CLI) from 200::
+# Commit ID 85
+# Committed 2022-01-26T17:31:47.5+00:00 by admin (MD-CLI) from 200::
+# Commit ID 84
+# Committed 2022-01-26T17:29:35.0+00:00 by admin (MD-CLI) from 200::
+# Commit ID 83
+# Committed 2022-01-26T17:27:54.7+00:00 by admin (MD-CLI) from 200::
+# Commit ID 82
+# Committed 2022-01-26T17:15:06.7+00:00 by admin (MD-CLI) from 200::
+# Commit ID 81
+# Committed 2022-01-26T17:13:57.2+00:00 by admin (MD-CLI) from 200::
+# Commit ID 80
+# Committed 2022-01-26T16:13:51.9+00:00 by admin (MD-CLI) from 200::
+# Commit ID 79
+# Committed 2022-01-26T16:12:30.0+00:00 by admin (MD-CLI) from 200::
+# Commit ID 78
+# Committed 2022-01-26T15:59:11.5+00:00 by admin (MD-CLI) from 200::
+# Commit ID 77
+# Committed 2022-01-24T20:17:49.8+00:00 by admin (MD-CLI) from 200::
+# Commit ID 76
+# Committed 2022-01-24T20:11:41.4+00:00 by admin (MD-CLI) from 200::
+# Commit ID 75
+# Committed 2022-01-19T20:38:01.6+00:00 by admin (MD-CLI) from 200::
+# Commit ID 74
+# Committed 2022-01-19T20:36:51.8+00:00 by admin (MD-CLI) from 200::
+# Commit ID 73
+# Committed 2022-01-19T20:29:32.2+00:00 by admin (MD-CLI) from 200::
+# Commit ID 72
+# Committed 2022-01-19T19:59:04.6+00:00 by admin (MD-CLI) from 200::
+# Commit ID 71
+# Committed 2022-01-19T19:59:00.7+00:00 by admin (MD-CLI) from 200::
+
+configure {
+    card 1 {
+        card-type iom-1
+        mda 1 {
+            mda-type me12-100gb-qsfp28
+        }
+        mda 2 {
+        }
+        fp 1 {
+        }
+    }
+    log {
+        filter "1001" {
+            named-entry "10" {
+                description "Collect only events of major severity or higher"
+                action forward
+                match {
+                    severity {
+                        gte major
+                    }
+                }
+            }
+        }
+        log-id "100" {
+            description "Default Serious Errors Log"
+            filter "1001"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+        log-id "99" {
+            description "Default System Log"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+    }
+    policy-options {
+        community "color-100" {
+            member "color:00:100" { }
+            member "target:65510:100" { }
+        }
+        community "vrf-100-community" {
+            member "target:65510:100" { }
+        }
+        policy-statement "vrf-100-import" {
+            entry 10 {
+                from {
+                    community {
+                        name "color-100"
+                    }
+                }
+                action {
+                    action-type accept
+                    flex-algo 129
+                }
+            }
+        }
+    }
+    port 1/1/c1 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c1/1 {
+        admin-state enable
+    }
+    port 1/1/c2 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c2/1 {
+        admin-state enable
+    }
+    port 1/1/c3 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c3/1 {
+        admin-state enable
+    }
+    port 1/1/c4 {
+    }
+    port 1/1/c5 {
+    }
+    port 1/1/c6 {
+    }
+    port 1/1/c7 {
+    }
+    port 1/1/c8 {
+    }
+    port 1/1/c9 {
+    }
+    port 1/1/c10 {
+    }
+    port 1/1/c11 {
+    }
+    port 1/1/c12 {
+    }
+    router "Base" {
+        autonomous-system 6500
+        interface "system" {
+            ipv4 {
+                primary {
+                    address 5.5.5.5
+                    prefix-length 32
+                }
+            }
+        }
+        interface "toR1" {
+            port 1/1/c1/1
+            ipv4 {
+                bfd {
+                    admin-state enable
+                }
+                primary {
+                    address 10.1.1.19
+                    prefix-length 31
+                }
+            }
+            if-attribute {
+                delay {
+                    delay-selection dynamic
+                    dynamic {
+                        measurement-template "direct"
+                        twamp-light {
+                            ipv4 {
+                                admin-state enable
+                                destination 10.1.1.18
+                                source 10.1.1.19
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        interface "toR7" {
+            port 1/1/c2/1
+            ipv4 {
+                bfd {
+                    admin-state enable
+                }
+                primary {
+                    address 10.1.1.20
+                    prefix-length 31
+                }
+            }
+            if-attribute {
+                delay {
+                    static 100
+                }
+            }
+        }
+        mpls-labels {
+            sr-labels {
+                start 20001
+                end 20200
+            }
+            reserved-label-block "sr-bsid" {
+                start-label 20300
+                end-label 20900
+            }
+        }
+        bgp {
+            min-route-advertisement 1
+            vpn-apply-export true
+            vpn-apply-import true
+            rapid-withdrawal true
+            ebgp-default-reject-policy {
+                import false
+                export false
+            }
+            rapid-update {
+                vpn-ipv4 true
+                vpn-ipv6 true
+                l2-vpn true
+                mvpn-ipv4 true
+                mdt-safi true
+                mcast-vpn-ipv4 true
+                mvpn-ipv6 true
+                evpn true
+                label-ipv4 true
+                label-ipv6 true
+                mcast-vpn-ipv6 true
+            }
+            group "mpls" {
+                type internal
+                family {
+                    vpn-ipv4 true
+                    l2-vpn true
+                    mvpn-ipv4 true
+                    evpn true
+                }
+            }
+            neighbor "1.1.1.1" {
+                group "mpls"
+            }
+            neighbor "2.2.2.2" {
+                group "mpls"
+            }
+            neighbor "3.3.3.3" {
+                group "mpls"
+            }
+            neighbor "4.4.4.4" {
+                group "mpls"
+            }
+            neighbor "6.6.6.6" {
+                group "mpls"
+            }
+            neighbor "7.7.7.7" {
+                group "mpls"
+            }
+        }
+        isis 0 {
+            admin-state enable
+            advertise-router-capability area
+            level-capability 2
+            traffic-engineering true
+            area-address [49.01]
+            timers {
+                spf-wait {
+                    spf-max-wait 1000
+                    spf-initial-wait 10
+                    spf-second-wait 100
+                }
+                lsp-wait {
+                    lsp-max-wait 500
+                    lsp-second-wait 100
+                }
+            }
+            loopfree-alternate {
+                remote-lfa {
+                    node-protect {
+                    }
+                }
+                ti-lfa {
+                    node-protect { }
+                }
+            }
+            flexible-algorithms {
+                admin-state enable
+                flex-algo 129 {
+                    participate true
+                    advertise "FAD-129-delay"
+                    loopfree-alternate { }
+                }
+            }
+            segment-routing {
+                admin-state enable
+                tunnel-table-pref 15
+                prefix-sid-range {
+                    global
+                }
+            }
+            interface "system" {
+                ipv4-node-sid {
+                    index 5
+                }
+                flex-algo 129 {
+                    ipv4-node-sid {
+                        index 50
+                    }
+                }
+            }
+            interface "toR1" {
+                interface-type point-to-point
+            }
+            interface "toR7" {
+                interface-type point-to-point
+            }
+            level 2 {
+                wide-metrics-only true
+            }
+        }
+        ldp {
+            interface-parameters {
+                interface "toR1" {
+                    ipv4 {
+                    }
+                }
+                interface "toR7" {
+                    ipv4 {
+                    }
+                }
+            }
+        }
+        mpls {
+            admin-state enable
+        }
+        rsvp {
+        }
+        segment-routing {
+            sr-policies {
+                admin-state enable
+                reserved-label-block "sr-bsid"
+                static-policy "SR-Pol-flex-pe6" {
+                    admin-state enable
+                    color 100
+                    endpoint 6.6.6.6
+                    head-end local
+                    binding-sid 20399
+                    distinguisher 64005
+                    segment-list 1 {
+                        admin-state enable
+                        segment 1 {
+                            mpls-label 20061
+                        }
+                    }
+                }
+            }
+        }
+        twamp-light {
+            reflector {
+                admin-state enable
+                udp-port 64364
+                prefix 0.0.0.0/0 {
+                }
+            }
+        }
+    }
+    routing-options {
+        ip-fast-reroute true
+        flexible-algorithm-definitions {
+            flex-algo "FAD-129-delay" {
+                admin-state enable
+                description "flex-algo 129 -delay"
+                metric-type delay
+                priority 200
+            }
+        }
+    }
+    service {
+        vprn "100" {
+            admin-state enable
+            service-id 100
+            customer "1"
+            autonomous-system 65555
+            bgp-ipvpn {
+                mpls {
+                    admin-state enable
+                    route-distinguisher "5.5.5.5:100"
+                    vrf-target {
+                        export-community "target:65510:100"
+                    }
+                    vrf-import {
+                        policy ["vrf-100-import"]
+                    }
+                    auto-bind-tunnel {
+                        resolution filter
+                        allow-flex-algo-fallback true
+                        resolution-filter {
+                            sr-isis true
+                            sr-policy true
+                        }
+                    }
+                }
+            }
+            interface "local" {
+                admin-state enable
+                loopback true
+                ipv4 {
+                    primary {
+                        address 10.4.1.1
+                        prefix-length 32
+                    }
+                }
+            }
+            interface "twl-flexa" {
+                admin-state enable
+                loopback true
+                ipv4 {
+                    primary {
+                        address 10.100.0.1
+                        prefix-length 32
+                    }
+                }
+            }
+            twamp-light {
+                reflector {
+                    admin-state enable
+                    udp-port 64364
+                    prefix 100.100.100.8/32 {
+                    }
+                }
+            }
+        }
+    }
+    system {
+        name "R5"
+        management-interface {
+            configuration-mode model-driven
+            netconf {
+                admin-state enable
+                auto-config-save true
+                capabilities {
+                    candidate false
+                }
+            }
+        }
+        bluetooth {
+            advertising-timeout 30
+        }
+        security {
+            aaa {
+                local-profiles {
+                    profile "administrative" {
+                        default-action permit-all
+                        netconf {
+                            base-op-authorization {
+                                action true
+                                cancel-commit true
+                                close-session true
+                                commit true
+                                copy-config true
+                                create-subscription true
+                                delete-config true
+                                discard-changes true
+                                edit-config true
+                                get true
+                                get-config true
+                                get-data true
+                                get-schema true
+                                kill-session true
+                                lock true
+                                validate true
+                            }
+                        }
+                        entry 10 {
+                            action permit
+                            match "configure system security"
+                        }
+                        entry 20 {
+                            action permit
+                            match "show system security"
+                        }
+                        entry 30 {
+                            action permit
+                            match "tools perform security"
+                        }
+                        entry 40 {
+                            action permit
+                            match "tools dump security"
+                        }
+                        entry 50 {
+                            action permit
+                            match "admin system security"
+                        }
+                        entry 100 {
+                            action deny
+                            match "configure li"
+                        }
+                        entry 110 {
+                            action deny
+                            match "show li"
+                        }
+                        entry 111 {
+                            action deny
+                            match "clear li"
+                        }
+                        entry 112 {
+                            action deny
+                            match "tools dump li"
+                        }
+                    }
+                    profile "default" {
+                        entry 10 {
+                            action permit
+                            match "exec"
+                        }
+                        entry 20 {
+                            action permit
+                            match "exit"
+                        }
+                        entry 30 {
+                            action permit
+                            match "help"
+                        }
+                        entry 40 {
+                            action permit
+                            match "logout"
+                        }
+                        entry 50 {
+                            action permit
+                            match "password"
+                        }
+                        entry 60 {
+                            action deny
+                            match "show config"
+                        }
+                        entry 65 {
+                            action deny
+                            match "show li"
+                        }
+                        entry 66 {
+                            action deny
+                            match "clear li"
+                        }
+                        entry 67 {
+                            action deny
+                            match "tools dump li"
+                        }
+                        entry 68 {
+                            action deny
+                            match "state li"
+                        }
+                        entry 70 {
+                            action permit
+                            match "show"
+                        }
+                        entry 75 {
+                            action permit
+                            match "state"
+                        }
+                        entry 80 {
+                            action permit
+                            match "enable-admin"
+                        }
+                        entry 90 {
+                            action permit
+                            match "enable"
+                        }
+                        entry 100 {
+                            action deny
+                            match "configure li"
+                        }
+                    }
+                }
+            }
+            ssh {
+                server-cipher-list-v1 {
+                    cipher 200 {
+                        name 3des
+                    }
+                    cipher 205 {
+                        name blowfish
+                    }
+                }
+                server-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 210 {
+                        name blowfish-cbc
+                    }
+                    cipher 215 {
+                        name cast128-cbc
+                    }
+                    cipher 220 {
+                        name arcfour
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                    cipher 235 {
+                        name rijndael-cbc
+                    }
+                }
+                client-cipher-list-v1 {
+                    cipher 200 {
+                        name 3des
+                    }
+                    cipher 205 {
+                        name blowfish
+                    }
+                    cipher 210 {
+                        name des
+                    }
+                }
+                client-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 210 {
+                        name blowfish-cbc
+                    }
+                    cipher 215 {
+                        name cast128-cbc
+                    }
+                    cipher 220 {
+                        name arcfour
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                    cipher 235 {
+                        name rijndael-cbc
+                    }
+                }
+                server-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 230 {
+                        name hmac-ripemd160
+                    }
+                    mac 235 {
+                        name hmac-ripemd160-openssh-com
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+                client-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 230 {
+                        name hmac-ripemd160
+                    }
+                    mac 235 {
+                        name hmac-ripemd160-openssh-com
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+            }
+            user-params {
+                local-user {
+                    user "admin" {
+                        password "$2y$10$TQrZlpBDra86.qoexZUzQeBXDY1FcdDhGWdD9lLxMuFyPVSm0OGy6"
+                        access {
+                            console true
+                            netconf true
+                        }
+                        console {
+                            member ["administrative"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+    test-oam {
+        link-measurement {
+            measurement-template "direct" {
+                admin-state enable
+                unidirectional-measurement derived
+                delay max
+                interval 1
+                twamp-light {
+                    dest-udp-port 64364
+                }
+                aggregate-sample-window {
+                    multiplier 3
+                    threshold {
+                        relative 15
+                        absolute 100
+                    }
+                }
+                sample-window {
+                    threshold {
+                        relative 30
+                        absolute 200
+                    }
+                }
+            }
+        }
+    }
+}
+
+persistent-indices {
+    description "Persistent indices are maintained by the system and must not be modified."
+    vrtr-id {
+        router-name "100" vrtr-id 2
+    }
+    vrtr-if-id {
+        router-name "100" interface-name "local" vrtr-id 2 if-index 4
+        router-name "100" interface-name "twl-flexa" vrtr-id 2 if-index 5
+        router-name "Base" interface-name "toR1" vrtr-id 1 if-index 2
+        router-name "Base" interface-name "toR7" vrtr-id 1 if-index 3
+    }
+}
+
+# Finished 2022-01-31T17:54:40.9+00:00
